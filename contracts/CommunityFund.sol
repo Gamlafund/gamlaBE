@@ -26,7 +26,7 @@ contract CommunityFund {
     communityFundData.participants         = participants;
   }
 
-  function deposit(int amount, address participant) {
+  function deposit(int amount, address participant) external payable {
     // -- keep track of who is depositing and how much.
     require(msg.value == 2 ether, "please send two ether");
   }
