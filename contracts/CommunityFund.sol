@@ -5,25 +5,22 @@ pragma solidity ^0.8.4;
 import "hardhat/console.sol";
 
 struct CommunityFundStruct {
-  int numberOfParticipants;
-  int recurringAmount;
-  int duration;
-  uint startDate;
   address[] participants;
+
+  int  recurringAmount;
+  int  duration;
+  uint startDate;
 }
 
 contract CommunityFund {
   CommunityFundStruct public communityFundData;
 
-  constructor(int numberOfParticipants, int recurringAmount, int duration, uint startDate, address[] memory participants) {
-    console.log("Creating community fund");
+  constructor(address[] memory participants, int recurringAmount, int duration, uint startDate) {
+    communityFundData.participants    = participants;
 
-    communityFundData.numberOfParticipants = numberOfParticipants;
-    communityFundData.recurringAmount      = recurringAmount;
-    communityFundData.duration             = duration;
-    communityFundData.startDate            = startDate;
-
-    communityFundData.participants         = participants;
+    communityFundData.recurringAmount = recurringAmount;
+    communityFundData.duration        = duration;
+    communityFundData.startDate       = startDate;
   }
 
   function deposit(int amount, address participant) external payable {
