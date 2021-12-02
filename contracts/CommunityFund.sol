@@ -7,15 +7,15 @@ import "hardhat/console.sol";
 struct CommunityFundStruct {
   address[] participants;
 
-  int  recurringAmount;
-  int  duration;
+  uint recurringAmount;
   uint startDate;
+  uint duration;
 }
 
 contract CommunityFund {
   CommunityFundStruct public communityFundData;
 
-  constructor(address[] memory participants, int recurringAmount, int duration, uint startDate) {
+  constructor(address[] memory participants, uint recurringAmount, uint startDate, uint duration) {
     communityFundData.participants    = participants;
 
     communityFundData.recurringAmount = recurringAmount;
@@ -23,9 +23,9 @@ contract CommunityFund {
     communityFundData.startDate       = startDate;
   }
 
-  function deposit(int amount, address participant) external payable {
-    // -- keep track of who is depositing and how much.
-    require(msg.value == 2 ether, "please send two ether");
+  function deposit() external payable {
+    // -- TODO: keep track of who is depositing and how much.
+    require(msg.value == communityFundData.recurringAmount, "please deposit exact amount");
   }
 
   function getCommunityFundData() public view returns(CommunityFundStruct memory) {

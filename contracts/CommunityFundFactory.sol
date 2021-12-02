@@ -11,7 +11,9 @@ contract CommunityFundFactory {
 
   event CommunityFundCreated(address communityFundAddress);
 
-  function createCommunityFund(address[] memory participants, int recurringAmount, int duration, uint startDate) public {
+  function createCommunityFund(
+    address[] memory participants, uint recurringAmount, uint startDate, uint duration
+  ) public {
     address communityFund = address(new CommunityFund(
       participants, recurringAmount, duration, startDate
     ));
