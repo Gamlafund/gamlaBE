@@ -1,12 +1,15 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-// function createCommunityFund(int numberOfParticipants, int recurringAmount, int duration, unit startDate, address[] participants) {
-
 describe("Community Fund", function () {
   let communityFundFactory;
   let communityFund;
+  
   let participants;
+
+  let recurringAmount = 500;
+  let startDate       = Date.now() + 86400 * 5;
+  let duration        = 12;
 
   before( async ()=>{
     const CommunityFundFactory = await ethers.getContractFactory("CommunityFundFactory");
@@ -17,7 +20,9 @@ describe("Community Fund", function () {
   })
 
   it("Should create a Community Fund", async  ()=> {
-    const deployCommunityFund = await communityFundFactory.createCommunityFund(participants, 1000, 12, 1638314000)
+    const deployCommunityFund = await communityFundFactory.createCommunityFund(
+      participants, recurringAmount, startDate, duration
+    )
     const CommunityFund = await ethers.getContractFactory("CommunityFund");
 
     communityFund = CommunityFund.attach((await deployCommunityFund.wait()).events[0].args.communityFundAddress);
@@ -25,13 +30,16 @@ describe("Community Fund", function () {
     let   communityFundData = await communityFund.getCommunityFundData();
 
     expect(await communityFundData.participants.length == participants.length);
-    expect(await communityFundData.recurringAmount.toNumber() == 1000);
-    expect(await communityFundData.duration.toNumber() == 12);
+    expect(await communityFundData.recurringAmount.toNumber() == recurringAmount);
+    expect(await communityFundData.duration.toNumber() == duration);
   });
 
-  it("Should have 0 balance at first", async  ()=> {
+  it("Should have a 0 balance at first", async  ()=> {
     expect( (await hre.ethers.provider.getBalance(communityFund.address)).toBigInt() == 0);
   });
 
-  // TODO: deposit amount on the community fund contract and verify the contract balances matches it.
+  it("Should have exactly " + recurringAmount + " deposited in the fund", async  ()=> {
+    const receipt = await communityFund.deposit({ value: recurringAmount });
+    expect( (await hre.ethers.provider.getBalance(communityFund.address)).toBigInt() == recurringAmount);
+  });
 });
