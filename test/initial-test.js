@@ -6,6 +6,9 @@ describe("Community Fund", function () {
   let communityFund;
   
   let participants;
+  let requiredNbOfParticipants = 20;
+
+  let fundName = "Test Community Fund";
 
   let recurringAmount = 500;
   let startDate       = Date.now() + 86400 * 5;
@@ -16,28 +19,49 @@ describe("Community Fund", function () {
     communityFundFactory = await CommunityFundFactory.deploy();
     await communityFundFactory.deployed();
 
-    participants = (await ethers.getSigners()).map(account => account.address);
+    [firstParticipant, secondParticipant, rest] = await ethers.getSigners();
   })
 
-  it("Should create a Community Fund", async  ()=> {
-    const deployCommunityFund = await communityFundFactory.createCommunityFund(
-      participants, recurringAmount, startDate, duration
-    )
-    const CommunityFund = await ethers.getContractFactory("CommunityFund");
+  describe("Starting a Community Fund", function () {
+    it("Should create a Community Fund", async  ()=> {
+      const deployCommunityFund = await communityFundFactory.createCommunityFund(
+        fundName, requiredNbOfParticipants, recurringAmount, startDate, duration
+      )
+      const CommunityFund = await ethers.getContractFactory("CommunityFund");
 
-    communityFund = CommunityFund.attach((await deployCommunityFund.wait()).events[0].args.communityFundAddress);
+      communityFund = CommunityFund.attach((await deployCommunityFund.wait()).events[0].args.communityFundAddress);
+      communityFund.connect(firstParticipant);
 
-    expect(await communityFund.participants.length == participants.length);
-    expect(await communityFund.recurringAmount == recurringAmount);
-    expect(await communityFund.duration == duration);
+      expect(await communityFund.name()).to.equal(fundName);
+      expect(await communityFund.recurringAmount()).to.equal(recurringAmount);
+      expect(await communityFund.startDate()).to.equal(startDate);
+      expect(await communityFund.duration()).to.equal(duration);
+    });
+
+    it("Should have a 0 balance at first", async  ()=> {
+      expect(await hre.ethers.provider.getBalance(communityFund.address)).to.equal(0);
+    });
   });
 
-  it("Should have a 0 balance at first", async  ()=> {
-    expect( (await hre.ethers.provider.getBalance(communityFund.address)).toBigInt() == 0);
-  });
+  describe("Making deposits into the Community Fund", function () {
+    it("Should have exactly " + recurringAmount + " deposited in the fund from one participant", async  ()=> {
+      const receipt = await communityFund.deposit({ value: recurringAmount });
+      expect((await communityFund.participants(firstParticipant.address)).balance).to.equal(recurringAmount);
+    });
 
-  it("Should have exactly " + recurringAmount + " deposited in the fund", async  ()=> {
-    const receipt = await communityFund.deposit({ value: recurringAmount });
-    expect( (await hre.ethers.provider.getBalance(communityFund.address)).toBigInt() == recurringAmount);
+    it("Should have exactly " + recurringAmount + " in the fund after the 1st deposit", async  ()=> {
+      expect(await hre.ethers.provider.getBalance(communityFund.address)).to.equal(recurringAmount);
+    });
+
+    it("Should have exactly " + recurringAmount + " deposited in the fund from another participant", async  ()=> {
+      const secondCommunityFundParticipant = communityFund.connect(secondParticipant);
+
+      const receipt = await secondCommunityFundParticipant.deposit({ value: recurringAmount });
+      expect((await communityFund.participants(secondParticipant.address)).balance).to.equal(recurringAmount);
+    });
+
+    it("Should have exactly " + 2 * recurringAmount + " in the fund after the 2nd deposit", async  ()=> {
+      expect(await hre.ethers.provider.getBalance(communityFund.address)).to.equal(2*recurringAmount);
+    });
   });
 });

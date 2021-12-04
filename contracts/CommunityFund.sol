@@ -3,22 +3,48 @@
 pragma solidity ^0.8.4;
 
 contract CommunityFund {
-  address[] public participants;
+  string public name;
 
+  uint public requiredNbOfParticipants;
   uint public recurringAmount;
   uint public startDate;
   uint public duration;
 
-  constructor(address[] memory _participants, uint _recurringAmount, uint _startDate, uint _duration) {
-    participants    = _participants;
+  struct Participant {
+    uint balance;
+    bool exists;
+  }
 
-    recurringAmount = _recurringAmount;
-    duration        = _duration;
-    startDate       = _startDate;
+  mapping (address => Participant) public participants;
+  address[] public allParticipants;
+
+  constructor(
+    string memory _name,
+    uint _requiredNbOfParticipants,
+    uint _recurringAmount,
+    uint _startDate,
+    uint _duration
+  ) {
+    name = _name;
+
+    requiredNbOfParticipants = _requiredNbOfParticipants;
+    recurringAmount          = _recurringAmount;
+    duration                 = _duration;
+    startDate                = _startDate;
   }
 
   function deposit() external payable {
-    // -- TODO: keep track of who is depositing and how much.
-    require(msg.value == recurringAmount, "please deposit exact amount");
+    require (
+      (allParticipants.length < requiredNbOfParticipants) || 
+      (participants[msg.sender].exists = true),
+      "max participants reached"
+    );
+    require (msg.value == recurringAmount, "please deposit exact amount");
+
+    // -- TODO: only allow one deposit per month.
+
+    participants[msg.sender].balance += msg.value;
+    participants[msg.sender].exists  =  true;
+    allParticipants.push(msg.sender);
   }
 }

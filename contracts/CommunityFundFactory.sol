@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
-
 import "./CommunityFund.sol";
 
 contract CommunityFundFactory {
@@ -12,14 +10,17 @@ contract CommunityFundFactory {
   event CommunityFundCreated(address communityFundAddress);
 
   function createCommunityFund(
-    address[] memory participants, uint recurringAmount, uint startDate, uint duration
-  ) public {
+    string calldata name,
+    uint requiredNbOfParticipants,
+    uint recurringAmount,
+    uint startDate,
+    uint duration
+  ) external {
     address communityFund = address(new CommunityFund(
-      participants, recurringAmount, duration, startDate
+      name, requiredNbOfParticipants, recurringAmount, startDate, duration
     ));
 
     communityFunds.push(communityFund);
-
     emit CommunityFundCreated(communityFund);
   }
 }
