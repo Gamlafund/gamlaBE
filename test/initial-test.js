@@ -27,11 +27,9 @@ describe("Community Fund", function () {
 
     communityFund = CommunityFund.attach((await deployCommunityFund.wait()).events[0].args.communityFundAddress);
 
-    let   communityFundData = await communityFund.getCommunityFundData();
-
-    expect(await communityFundData.participants.length == participants.length);
-    expect(await communityFundData.recurringAmount.toNumber() == recurringAmount);
-    expect(await communityFundData.duration.toNumber() == duration);
+    expect(await communityFund.participants.length == participants.length);
+    expect(await communityFund.recurringAmount == recurringAmount);
+    expect(await communityFund.duration == duration);
   });
 
   it("Should have a 0 balance at first", async  ()=> {
