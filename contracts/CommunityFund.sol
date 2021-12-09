@@ -35,7 +35,7 @@ contract CommunityFund {
 
   function deposit() external payable {
     require(participants[msg.sender].collateral == true, "collateral required");
-    require (msg.value == recurringAmount, "please deposit exact amount");
+    require(msg.value == recurringAmount, "please deposit exact amount");
 
     // -- TODO: only allow for one deposit per month.
   
@@ -43,9 +43,9 @@ contract CommunityFund {
   }
 
   function collateral() external payable {
-    require (allParticipants.length < requiredNbOfParticipants, "max participants reached");
+    require(allParticipants.length < requiredNbOfParticipants, "max participants reached");
     require(participants[msg.sender].collateral == false, "collateral already locked");
-    require (msg.value == recurringAmount * duration, "exact collateral required");
+    require(msg.value == recurringAmount * duration, "exact collateral required");
 
     participants[msg.sender].balance   += msg.value;
     participants[msg.sender].collateral = true;
