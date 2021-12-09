@@ -23,4 +23,8 @@ contract CommunityFundFactory {
     communityFunds.push(communityFund);
     emit CommunityFundCreated(communityFund);
   }
+
+  function getCommunityFunds() external view returns (address[] memory) {
+    return communityFunds;
+  }
 }
