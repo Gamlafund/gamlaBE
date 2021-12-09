@@ -12,7 +12,7 @@ contract CommunityFund {
 
   struct Participant {
     uint balance;
-    bool exists;
+    bool collateral;
   }
 
   mapping (address => Participant) public participants;
@@ -34,17 +34,22 @@ contract CommunityFund {
   }
 
   function deposit() external payable {
-    require (
-      (allParticipants.length < requiredNbOfParticipants) || 
-      (participants[msg.sender].exists = true),
-      "max participants reached"
-    );
+    require(participants[msg.sender].collateral == true, "collateral required");
     require (msg.value == recurringAmount, "please deposit exact amount");
 
-    // -- TODO: only allow one deposit per month.
-
+    // -- TODO: only allow for one deposit per month.
+  
     participants[msg.sender].balance += msg.value;
-    participants[msg.sender].exists  =  true;
+  }
+
+  function collateral() external payable {
+    require (allParticipants.length < requiredNbOfParticipants, "max participants reached");
+    require(participants[msg.sender].collateral == false, "collateral already locked");
+    require (msg.value == recurringAmount * duration, "exact collateral required");
+
+    participants[msg.sender].balance   += msg.value;
+    participants[msg.sender].collateral = true;
+
     allParticipants.push(msg.sender);
   }
 }
