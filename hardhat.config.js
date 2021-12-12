@@ -19,10 +19,14 @@ module.exports = {
   networks: {
     rinkeby: {
       url: process.env.ALCHEMY_RINKEBY_URL,
-      accounts: [process.env.RINKEBY_ACCOUNT_KEY]
+      accounts: [process.env.ALCHEMY_ACCOUNT_KEY]
+    },
+    polygon: {
+      url: process.env.ALCHEMY_POLYGON_MUMBAI_URL,
+      accounts: [process.env.POLYGON_ACCOUNT_KEY]
     },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
+    apiKey: process.env.POLYGONSCAN_API_KEY
   }
 };
