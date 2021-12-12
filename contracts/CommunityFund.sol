@@ -24,13 +24,23 @@ contract CommunityFund {
     uint _recurringAmount,
     uint _startDate,
     uint _duration
-  ) {
+  ) payable {
+    require(block.timestamp < _startDate, "start date of the fund must be in the future!");
+    require((msg.value == 0) || (msg.value >= recurringAmount * duration), "not enough collateral");
+
     name = _name;
 
     requiredNbOfParticipants = _requiredNbOfParticipants;
     recurringAmount          = _recurringAmount;
     duration                 = _duration;
     startDate                = _startDate;
+
+    if (msg.value > 0) {
+      participants[msg.sender].balance   += msg.value;
+      participants[msg.sender].collateral = true;
+
+      allParticipants.push(msg.sender);
+    }
   }
 
   function deposit() external payable {

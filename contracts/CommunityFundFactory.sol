@@ -15,13 +15,14 @@ contract CommunityFundFactory {
     uint recurringAmount,
     uint startDate,
     uint duration
-  ) external {
-    address communityFund = address(new CommunityFund(
+  ) external payable {
+    CommunityFund communityFund = (new CommunityFund){value: msg.value}( 
       name, requiredNbOfParticipants, recurringAmount, startDate, duration
-    ));
+    );
+    address communityFundAddress = address(communityFund);
 
-    communityFunds.push(communityFund);
-    emit CommunityFundCreated(communityFund);
+    communityFunds.push(communityFundAddress);
+    emit CommunityFundCreated(communityFundAddress);
   }
 
   function getCommunityFunds() external view returns (address[] memory) {
