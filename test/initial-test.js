@@ -9,9 +9,8 @@ describe("Community Fund", function () {
   let requiredNbOfParticipants = 20;
 
   let fundName = "Test Community Fund";
-
   let recurringAmount = 500;
-  let startDate       = Date.now() + 86400 * 5;
+  let startDate       = Math.floor(Date.now() / 1000) + 86400 * 5;
   let duration        = 12;
 
   before( async ()=>{
@@ -47,12 +46,14 @@ describe("Community Fund", function () {
     const collateral = recurringAmount * duration
     it("Should have exactly " + collateral + " collateral from one participant", async  ()=> {
       const receipt = await communityFund.collateral({ value: collateral });
+      await receipt.wait();
       expect((await communityFund.participants(firstParticipant.address)).balance).to.equal(collateral);
     });
 
     const expected = recurringAmount + collateral;
     it("Should have exactly " + expected + " deposited in the fund from one participant", async  ()=> {
       const receipt  = await communityFund.deposit({ value: recurringAmount });
+      await receipt.wait();
       expect((await communityFund.participants(firstParticipant.address)).balance).to.equal(expected);
     });
 
@@ -64,6 +65,7 @@ describe("Community Fund", function () {
     it("Should have exactly " + collateral + " collateral from another participant", async  ()=> {
       const secondCommunityFundParticipant = communityFund.connect(secondParticipant);
       const receipt = await secondCommunityFundParticipant.collateral({ value: collateral });
+      await receipt.wait();
       expect((await communityFund.participants(secondParticipant.address)).balance).to.equal(collateral);
     });
 
@@ -71,6 +73,7 @@ describe("Community Fund", function () {
       const secondCommunityFundParticipant = communityFund.connect(secondParticipant);
 
       const receipt = await secondCommunityFundParticipant.deposit({ value: recurringAmount });
+      await receipt.wait();
       expect((await communityFund.participants(secondParticipant.address)).balance).to.equal(expected);
     });
 
