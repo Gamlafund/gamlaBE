@@ -43,7 +43,7 @@ contract CommunityFund {
   }
 
   function collateral() external payable {
-    //require(block.timestamp < startDate, "collateral must be committed before the funds starts");
+    require(block.timestamp < startDate, "collateral must be committed before the funds starts");
     require(allParticipants.length < requiredNbOfParticipants, "max participants reached");
     require(participants[msg.sender].collateral == false, "collateral already locked");
     require(msg.value == recurringAmount * duration, "exact collateral required");
