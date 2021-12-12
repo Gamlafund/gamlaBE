@@ -4,6 +4,7 @@ const { ethers } = require("hardhat");
 describe("Community Fund", function () {
   let communityFundFactory;
   let communityFund;
+  let communityFundCollateralized;
   
   let participants;
   let requiredNbOfParticipants = 20;
@@ -42,7 +43,7 @@ describe("Community Fund", function () {
     });
   });
 
-  describe("Making deposits into the Community Fund", function () {
+  describe("Making deposits into a Community Fund", function () {
     const collateral = recurringAmount * duration
     it("Should have exactly " + collateral + " collateral from one participant", async  ()=> {
       const receipt = await communityFund.collateral({ value: collateral });
@@ -79,6 +80,20 @@ describe("Community Fund", function () {
 
     it("Should have exactly " + 2 * expected + " in the fund after the 2nd deposit", async  ()=> {
       expect(await hre.ethers.provider.getBalance(communityFund.address)).to.equal(2 * expected);
+    });
+  });
+
+  describe("Starting a Community Fund with Collateral", function () {
+    it("Should create a Community Fund and commit Collateral", async  ()=> {
+      const expected = recurringAmount * duration;
+      const deployCommunityFund = await communityFundFactory.createCommunityFund(
+        fundName, requiredNbOfParticipants, recurringAmount, startDate, duration, { value: expected }
+      )
+      const CommunityFund = await ethers.getContractFactory("CommunityFund");
+
+      communityFundCollateralized = CommunityFund.attach((await deployCommunityFund.wait()).events[0].args.communityFundAddress);
+
+      expect(await hre.ethers.provider.getBalance(communityFundCollateralized.address)).to.equal(expected);
     });
   });
 });
