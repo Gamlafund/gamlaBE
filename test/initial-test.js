@@ -44,7 +44,7 @@ describe("Community Fund", function () {
   });
 
   describe("Making deposits into a Community Fund", function () {
-    const collateral = recurringAmount * duration
+    const collateral = recurringAmount * duration * 1.2
     it("Should have exactly " + collateral + " collateral from one participant", async  ()=> {
       const receipt = await communityFund.collateral({ value: collateral });
       await receipt.wait();
@@ -85,7 +85,7 @@ describe("Community Fund", function () {
 
   describe("Starting a Community Fund with Collateral", function () {
     it("Should create a Community Fund and commit Collateral", async  ()=> {
-      const expected = recurringAmount * duration;
+      const expected = recurringAmount * duration * 1.2;
       const deployCommunityFund = await communityFundFactory.createCommunityFund(
         fundName, requiredNbOfParticipants, recurringAmount, startDate, duration, { value: expected }
       )

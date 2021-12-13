@@ -26,7 +26,7 @@ contract CommunityFund {
     uint _duration
   ) payable {
     require(block.timestamp < _startDate, "start date of the fund must be in the future!");
-    require((msg.value == 0) || (msg.value >= recurringAmount * duration), "not enough collateral");
+    require((msg.value == 0) || (msg.value >= _recurringAmount * _duration * 120 / 100), "not enough collateral");
 
     name = _name;
 
@@ -56,7 +56,7 @@ contract CommunityFund {
     require(block.timestamp < startDate, "collateral must be committed before the funds starts");
     require(allParticipants.length < requiredNbOfParticipants, "max participants reached");
     require(participants[msg.sender].collateral == false, "collateral already locked");
-    require(msg.value == recurringAmount * duration, "exact collateral required");
+    require(msg.value >= recurringAmount * duration * 120 / 100, "minimum collateral required");
 
     participants[msg.sender].balance   += msg.value;
     participants[msg.sender].collateral = true;
