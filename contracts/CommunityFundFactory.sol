@@ -16,8 +16,8 @@ contract CommunityFundFactory {
     uint startDate,
     uint duration
   ) external payable {
-    CommunityFund communityFund = (new CommunityFund){value: msg.value}( 
-      name, requiredNbOfParticipants, recurringAmount, startDate, duration
+    CommunityFund communityFund = (new CommunityFund){ value: msg.value }( 
+      msg.sender, name, requiredNbOfParticipants, recurringAmount, startDate, duration
     );
     address communityFundAddress = address(communityFund);
 

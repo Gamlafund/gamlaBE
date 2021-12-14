@@ -19,6 +19,7 @@ contract CommunityFund {
   address[] public allParticipants;
 
   constructor(
+    address _from,
     string memory _name,
     uint _requiredNbOfParticipants,
     uint _recurringAmount,
@@ -36,10 +37,10 @@ contract CommunityFund {
     startDate                = _startDate;
 
     if (msg.value > 0) {
-      participants[msg.sender].balance   += msg.value;
-      participants[msg.sender].collateral = true;
+      participants[_from].balance   += msg.value;
+      participants[_from].collateral = true;
 
-      allParticipants.push(msg.sender);
+      allParticipants.push(_from);
     }
   }
 
