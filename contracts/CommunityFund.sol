@@ -89,6 +89,27 @@ contract CommunityFund {
         allParticipants.push(msg.sender);
     }
 
+    function withdraw() public {
+        require(
+            participants[msg.sender].collateral == true,
+            "no committed collateral, nothing to withdraw"
+        );
+        require(
+            block.timestamp > startDate + 24 * 3600,
+            "cannot withdraw before the fund starts"
+        );
+        // -- TODO: add more conditions for when withdrawals are allowed
+        // --       eg. cannot withdraw until the funds end date once the fund has started
+        // --       and withdrawals allowed if the fund was not able to start (ie. not enough participants)
+
+        uint256 amount = participants[msg.sender].balance;
+
+        participants[msg.sender].balance = 0;
+        participants[msg.sender].collateral = false;
+
+        payable(msg.sender).transfer(amount);
+    }
+
     function getAllParticipants() external view returns (address[] memory) {
         return allParticipants;
     }
