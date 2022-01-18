@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 pragma solidity ^0.8.4;
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract CommunityFund {
     string public name;
@@ -12,8 +12,9 @@ contract CommunityFund {
     uint256 public duration;
 
     struct Participant {
-        uint256 balance;
+        uint256 collateralBalance;
         bool collateral;
+        uint256 usdtBalance;
     }
 
     mapping(address => Participant) public participants;
@@ -46,7 +47,7 @@ contract CommunityFund {
         startDate = _startDate;
 
         if (msg.value > 0) {
-            participants[_from].balance += msg.value;
+            participants[_from].collateralBalance += msg.value;
             participants[_from].collateral = true;
 
             allParticipants.push(_from);
@@ -58,11 +59,12 @@ contract CommunityFund {
             participants[msg.sender].collateral == true,
             "collateral required"
         );
+        USDT.transfer(address(this), recurringAmount);
         require(msg.value == recurringAmount, "please deposit exact amount");
 
         // -- TODO: only allow for one deposit per month.
 
-        participants[msg.sender].balance += msg.value;
+        participants[msg.sender].usdtBalance += recurringAmount;
     }
 
     function collateral() external payable {
@@ -83,7 +85,7 @@ contract CommunityFund {
             "minimum collateral required"
         );
 
-        participants[msg.sender].balance += msg.value;
+        participants[msg.sender].collateralBalance += msg.value;
         participants[msg.sender].collateral = true;
 
         allParticipants.push(msg.sender);
@@ -102,12 +104,14 @@ contract CommunityFund {
         // --       eg. cannot withdraw until the funds end date once the fund has started
         // --       and withdrawals allowed if the fund was not able to start (ie. not enough participants)
 
-        uint256 amount = participants[msg.sender].balance;
+        uint256 Collateralamount = participants[msg.sender].collateralBalance;
 
-        participants[msg.sender].balance = 0;
+        participants[msg.sender].collateralBalance = 0;
+        participants[msg.sender].usdtBalance = 0;
         participants[msg.sender].collateral = false;
 
-        payable(msg.sender).transfer(amount);
+        payable(msg.sender).transfer(Collateralamount);
+        USDT.transfer(msg.sender, participants[msg.sender].usdtBalance);
     }
 
     function getAllParticipants() external view returns (address[] memory) {
