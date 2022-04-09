@@ -16,14 +16,13 @@ contract Bidding{
 
     }
 
-    function Checking_Withdrawals(address _useraddress, address[] memory) public returns(bool Withdrawn){
-        uint len = Monthly_withdrawal.length;
-        for (i=0;i<len;){
-            if(Monthly_withdrawal[i]==_useraddress){
+
+    function Checking_Withdrawals(address _useraddress, address[] memory _Monthly_withdrawal) public returns(bool Withdrawn){
+        uint len = _Monthly_withdrawal.length;
+        for (i=0;i<len;i++){
+            if(_Monthly_withdrawal[i]==_useraddress){
                 return true;
             }
-            i++;
-
 
         }
     }
